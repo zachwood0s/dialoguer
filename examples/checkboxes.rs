@@ -4,10 +4,10 @@ use dialoguer::{theme::ColorfulTheme, Checkboxes};
 
 fn main() {
     let checkboxes = &[
-        "Ice Cream",
-        "Vanilla Cupcake",
-        "Chocolate Muffin",
-        "A Pile of sweet, sweet mustard",
+        ("Ice Cream", false),
+        ("Vanilla Cupcake", true),
+        ("Chocolate Muffin", false),
+        ("A Pile of sweet, sweet mustard", false)
     ];
     let states = &[
         false,
@@ -17,7 +17,7 @@ fn main() {
     ];
     let selections = Checkboxes::with_theme(&ColorfulTheme::default())
         .with_prompt("Pick your food")
-        .items_with_states(&checkboxes[..], &states[..])
+        .items_with_states(&checkboxes[..])
         .interact()
         .unwrap();
 
@@ -26,7 +26,7 @@ fn main() {
     } else {
         println!("You selected these things:");
         for selection in selections {
-            println!("  {}", checkboxes[selection]);
+            println!("  {}", checkboxes[selection].0);
         }
     }
 }

@@ -256,13 +256,19 @@ impl<'a> Checkboxes<'a> {
     }
 
     /// Adds multiple items to the selector.
-    pub fn items<T: ToString>(&mut self, items: &[T]) -> &mut Checkboxes<'a> {
-        let states: Vec<_> = repeat(false).take(items.len()).collect();
-        self.items_with_states(items, &states[..])
+    pub fn items<T: ToString>(&mut self, items: &[T]) -> &mut Checkboxes<'a>
+        where T: std::fmt::Display{
+        let states: Vec<bool> = vec![false; items.len()];
+        let zipped: Vec<(&T, bool)> = items
+          .iter()
+          .zip(states)
+          .into_iter()
+          .collect();
+        self.items_with_states(&zipped[..])
     }
 
-    pub fn items_with_states<T: ToString>(&mut self, items: &[T], states: &[bool]) -> &mut Checkboxes<'a> {
-        for (item, state) in items.iter().zip(states) {
+    pub fn items_with_states<T: ToString>(&mut self, items: &[(T, bool)]) -> &mut Checkboxes<'a>{
+        for (item, state) in items {
             self.items.push(item.to_string());
             self.states.push(*state);
         }
