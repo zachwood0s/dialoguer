@@ -19,6 +19,7 @@ pub struct Select<'a> {
 /// Renders a multi select checkbox menu.
 pub struct Checkboxes<'a> {
     items: Vec<String>,
+    states: Vec<bool>,
     prompt: Option<String>,
     clear: bool,
     theme: &'a Theme,
@@ -223,6 +224,7 @@ impl<'a> Checkboxes<'a> {
     pub fn with_theme(theme: &'a Theme) -> Checkboxes<'a> {
         Checkboxes {
             items: vec![],
+            states: vec![],
             clear: true,
             prompt: None,
             theme: theme,
@@ -244,14 +246,25 @@ impl<'a> Checkboxes<'a> {
 
     /// Add a single item to the selector.
     pub fn item(&mut self, item: &str) -> &mut Checkboxes<'a> {
+        self.item_with_state(item, false)
+    }
+
+    pub fn item_with_state(&mut self, item: &str, state: bool) -> &mut Checkboxes<'a> {
         self.items.push(item.to_string());
+        self.states.push(state);
         self
     }
 
     /// Adds multiple items to the selector.
     pub fn items<T: ToString>(&mut self, items: &[T]) -> &mut Checkboxes<'a> {
-        for item in items {
+        let states: Vec<_> = repeat(false).take(items.len()).collect();
+        self.items_with_states(items, &states[..])
+    }
+
+    pub fn items_with_states<T: ToString>(&mut self, items: &[T], states: &[bool]) -> &mut Checkboxes<'a> {
+        for (item, state) in items.iter().zip(states) {
             self.items.push(item.to_string());
+            self.states.push(*state);
         }
         self
     }
@@ -291,7 +304,7 @@ impl<'a> Checkboxes<'a> {
             let size = &items.len();
             size_vec.push(size.clone());
         }
-        let mut checked: Vec<_> = repeat(false).take(self.items.len()).collect();
+        let mut checked: Vec<_> = self.states.clone();
         loop {
             for (idx, item) in self
                 .items
